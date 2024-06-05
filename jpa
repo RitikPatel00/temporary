@@ -1,0 +1,100 @@
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+@Entity
+@Table(name = "user_charu")
+public class User {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer userid;
+	private String username;
+	private String password;
+	
+	
+	public User(Integer userid, String username, String password) {
+		this.userid = userid;
+		this.username = username;
+		this.password = password;
+	}
+	
+	public User() {
+		
+	}
+	public Integer getUserid() {
+		return userid;
+	}
+	public void setUserid(Integer userid) {
+		this.userid = userid;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	
+}
+[10:19 AM] charulishirsath123@gmail.com (Unverified)
+persistence.xml
+ 
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.2" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+	<persistence-unit name="JPA-Project">
+	<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+	<class>com.wipro.entity.User</class>
+	
+	<properties>
+			<property name="javax.persistence.jdbc.url"
+				value="jdbc:oracle:thin:@localhost:9501/XE" />
+			<property name="javax.persistence.jdbc.user"
+				value="system" />
+			<property name="javax.persistence.jdbc.password"
+				value="rps@123" />
+			<property name="javax.persistence.jdbc.driver"
+				value="oracle.jdbc.driver.OracleDriver" />
+			<property
+				name="javax.persistence.schema-generation.database.action"
+				value="update" />
+			<property name="hibernate.dialect"
+				value="org.hibernate.dialect.OracleDialect" />
+			<property name="hibernate.show_sql" value="true" />
+		</properties>
+	
+	</persistence-unit>
+</persistence>
+[10:21 AM] charulishirsath123@gmail.com (Unverified)
+App.java
+package com.wipro.app;
+import com.wipro.entity.User;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.PersistenceException;
+public class App {
+	public static void main(String[] args) {
+		try {
+		 EntityManagerFactory emf= 
+				Persistence.createEntityManagerFactory("JPA-Project");
+		
+	EntityManager entityManager=emf.createEntityManager();
+	entityManager.getTransaction().begin();
+	User user = new User(null,"admin","admin@123");
+	entityManager.persist(user);
+	System.out.println("User save to databas" );
+	entityManager.getTransaction().commit();
+		
+		}catch(PersistenceException e) {
+			e.printStackTrace();
+		}
+	}
+}
