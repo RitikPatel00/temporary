@@ -125,3 +125,14 @@ public class App {
 	</persistence-unit>
 
 -Doracle.jdbc.timezoneAsRegion=false
+
+public class Book{
+private Long isbn;
+private String title;
+private String author;
+private LocalDate publishDate;
+private Double price;
+
+
+}
+
