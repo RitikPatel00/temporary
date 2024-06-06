@@ -742,3 +742,13 @@ public class App {
 
 
 —-----------------------------------------------------------
+
+
+
+—---------------------------------Spring Boot AOP Project--------------------------
+
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
