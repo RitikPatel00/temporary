@@ -1,3 +1,75 @@
+package com.wipro.dao;
+import java.util.List;
+import com.wipro.entity.User;
+import jakarta.persistence.PersistenceException;
+public interface UserDAO {
+	public User getUserById(Integer userid) throws PersistenceException;
+	public List<User> getAllUsers() throws PersistenceException;;
+	public User addUser(User user) throws PersistenceException;;
+	public String deleteUser(String username) throws PersistenceException;;
+	public User updateUserPassword(User user) throws PersistenceException;;
+}
+
+—-------------------------------------------
+package com.wipro.dao;
+import java.util.Iterator;
+import java.util.List;
+import org.springframework.stereotype.Repository;
+import com.wipro.entity.User;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
+/*
+*  @Repository : Apply for DAO class
+*  @Service : Apply for Service class
+*  @Controller : Apply for Controller class
+*  @RestController : Apply for Rest Controller
+* 
+* 
+*  The above annotations are sub-types of @Component
+*/
+@Repository
+public class UserDaoImpl implements UserDAO{
+	
+	@PersistenceContext
+	private static EntityManagerFactory emf;
+	@Override
+	public User getUserById(Integer userid) throws PersistenceException {
+		EntityManager entityManager=null;
+		try {
+			entityManager = emf.createEntityManager();
+			User user = entityManager.find(User.class, userid);
+			if(user == null) {
+				throw new PersistenceException("Invalid userid");
+			}
+			return user;
+		}catch(PersistenceException e) {
+			throw e;
+		}
+	}
+	@Override
+	public List<User> getAllUsers() throws PersistenceException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public User addUser(User user) throws PersistenceException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public String deleteUser(String username) throws PersistenceException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public User updateUserPassword(User user) throws PersistenceException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+}
 
 package com.wipro.exception;
 public class UserException extends Exception{
