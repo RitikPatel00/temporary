@@ -1,3 +1,111 @@
+package com.wipro.service;
+import java.util.List;
+import com.wipro.entity.User;
+import com.wipro.exception.UserException;
+public interface UserService {
+	public User getUserById(Integer userid) throws UserException;
+	public List<User> getAllUsers() throws UserException;
+	public User addUser(User user) throws UserException;
+	public User deleteUser(Integer userID) throws UserException;
+	public User updateUser(User user) throws UserException;
+}
+
+
+—------------------------------------------------------------------------
+package com.wipro.service;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.wipro.dao.UserDAO;
+import com.wipro.entity.User;
+import com.wipro.exception.UserException;
+import jakarta.persistence.PersistenceException;
+@Service
+@Transactional
+public class UserServiceImpl implements UserService{
+	@Autowired
+	private UserDAO userDAO;
+	@Override
+	public User getUserById(Integer userid) throws UserException {
+		try {
+			return userDAO.getUserById(userid);
+			
+		}catch(PersistenceException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+	@Override
+	public List<User> getAllUsers() throws UserException {
+		try {
+			return userDAO.getAllUsers();
+			
+		}catch(PersistenceException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+	@Override
+	public User addUser(User user) throws UserException {
+		try {
+			return userDAO.addUser(user);
+			
+		}catch(PersistenceException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+	@Override
+	public User deleteUser(Integer userID) throws UserException {
+		try {
+			return userDAO.deleteUser(userID);
+			
+		}catch(PersistenceException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+	@Override
+	public User updateUser(User user) throws UserException {
+		try {
+			return userDAO.updateUser(user);
+			
+		}catch(PersistenceException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+}
+
+
+—-------------------------------------
+
+
+package com.wipro.controller;
+import org.springframework.web.bind.annotation.RestController;
+
+
+@RestController
+public class UserController {
+	//TO DO
+}
+
+
+
+
+—-----------------
+
+
+package com.wipro.aspect;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
+@Aspect
+@Slf4j
+@Component
+public class UserAspect {
+	//TO DO
+}
+
+
+
+
 package com.wipro.dao;
 import java.util.List;
 import org.springframework.stereotype.Repository;
