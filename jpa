@@ -1,4 +1,25 @@
 
+
+	@PutMapping("/users")
+	public ResponseEntity<User> updateUser(@RequestBody User user){
+		final String uri = "http://localhost:9091/api/v1/users";	  
+		try {
+	
+//			 restTemplate.put(uri, user);
+			
+			HttpEntity<User> request = new HttpEntity<User>(user);
+			
+			ResponseEntity<User> response = restTemplate
+				       .exchange(uri, HttpMethod.PUT, request,new ParameterizedTypeReference<User>() {});
+			
+			return response;
+		}catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+	}
+
+
+
 package com.wipro.controller;
 
 
