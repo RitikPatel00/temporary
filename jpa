@@ -1,4 +1,85 @@
-	//http://localhost:9092/cc/users/1
+
+package com.wipro.dao;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+/*
+* save(), findById(), findAll(), count(), existsById(), deleteById(), delete(), deleteAll()
+*/
+import com.wipro.entity.User;
+@Repository
+public interface UserRepository extends CrudRepository<User,Integer>{
+}
+
+
+—--------------------------------------
+
+package com.wipro.service;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import com.wipro.dao.UserRepository;
+import com.wipro.entity.User;
+import com.wipro.exception.UserException;
+public class UserServiceCrudImpl implements UserService {
+	
+	@Autowired
+	private UserRepository userRepository;
+	@Override
+	public User getUserById(Integer userid) throws UserException {
+		try {
+			Optional<User> optional = userRepository.findById(userid);
+			if(optional.isEmpty()) {
+				throw new UserException("Invalid Userid");
+			}
+			
+			return optional.get();
+		}catch(DataAccessException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+		
+	}
+	@Override
+	public List<User> getAllUsers() throws UserException {
+		try {
+			 Iterable<User> iterable = userRepository.findAll();
+			 List<User> userList = new ArrayList<>();
+			
+			 for(User u: iterable) {
+				 userList.add(u);
+			 }
+			
+			if(userList.isEmpty()) {
+				throw new UserException("Table is empty");
+			}
+			
+			return userList;
+		}catch(DataAccessException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+	@Override
+	public User addUser(User user) throws UserException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public User deleteUser(Integer userID) throws UserException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public User updateUser(User user) throws UserException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}
+
+
+
+
+//http://localhost:9092/cc/users/1
 	@DeleteMapping("/users/{userid}")
 	public ResponseEntity<User> deleteUser(@PathVariable(value="userid") Integer userid){
 		final String uri = "http://localhost:9091/api/v1/users/{userid}";	  
