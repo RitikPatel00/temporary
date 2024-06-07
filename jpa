@@ -1,3 +1,35 @@
+spring.application.name=spring-boot-jpa
+server.port=9091
+#server.servlet.contextPath=/springfox
+
+#Data Source
+spring.datasource.url= 
+spring.datasource.username= 
+spring.datasource.password= 
+spring.datasource.driverClassName= 
+
+#JPA-	Hibernate properties
+spring.jpa.properties.hibernate.dialect= 
+# Hibernate ddl auto (create, create-drop, validate, update)
+spring.jpa.hibernate.ddl-auto= update
+spring.jpa.hibernate.show-sql=true
+
+
+management.endpoints.web.exposure.include=*
+
+#Management end-points
+#management.endpoint.health.group.custom.include= diskSpace,ping
+#management.endpoint.health.group.custom.show-components=always
+#management.endpoint.health.group.custom.show-details=always
+
+info.app.name=Spring Boot User Application
+info.app.description=This is Spring Boot User REST Application
+info.app.version=1.0.0
+
+#spring.resources.add-mappings=true
+
+
+
 package com.wipro.aspect;
 import java.util.Arrays;
 import org.aspectj.lang.ProceedingJoinPoint;
