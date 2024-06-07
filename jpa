@@ -1,3 +1,22 @@
+	//http://localhost:9092/cc/users/1
+	@DeleteMapping("/users/{userid}")
+	public ResponseEntity<User> deleteUser(@PathVariable(value="userid") Integer userid){
+		final String uri = "http://localhost:9091/api/v1/users/{userid}";	  
+		
+		try {
+	
+			Map<String, Integer> params = new HashMap<>();
+			params.put("userid", userid);
+			ResponseEntity<User> user = this.consumeUserById(userid);
+			
+			restTemplate.delete(uri, params);
+			
+			return user;
+			
+		}catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+	}
 
 
 	@PutMapping("/users")
