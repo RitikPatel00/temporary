@@ -1,0 +1,902 @@
+package com.wipro.controller;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import com.wipro.entity.User;
+import com.wipro.exception.UserException;
+import com.wipro.service.UserService;
+@RestController
+@RequestMapping("/api/v1")
+//allow any client application to access the API end-points of this RestController
+@CrossOrigin(origins = "*")
+public class UserController {
+	@Autowired
+	private UserService userService;
+	//http://9091/api/v1/users/1
+	@GetMapping("/users/{userid}")
+	public User getUserById( @PathVariable(value="userid") Integer userid) {
+		try {
+			User user = userService.getUserById(userid);
+			return user;
+		}catch(UserException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	//http://9091/api/v1/users
+	@PostMapping("/users")
+	public User adUser(@RequestBody User user) {
+		try {
+			User newUser = userService.addUser(user);
+			return newUser;
+		}catch(UserException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	//http://9091/api/v1/users
+	@GetMapping("/users")
+	public List<User> getAllUsers() {
+		try {
+			List<User> userList = userService.getAllUsers();
+			return userList;
+		}catch(UserException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+}
+
+
+—---------------------
+{
+       "userid": null,
+       "username": "srini",
+       "password": "srini@123",
+       "email": "srini@gmail.com",
+       "mobile": 9976567680,
+       "role": "USER"
+       }
+—------------------------------------------------------------------
+
+package com.wipro.controller;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+import com.wipro.entity.User;
+import com.wipro.exception.UserException;
+import com.wipro.service.UserService;
+import jakarta.validation.Valid;
+@RestController
+@RequestMapping("/api/v1")
+//allow any client application to access the API end-points of this RestController
+@CrossOrigin(origins = "*")
+public class UserController {
+	@Autowired
+	private UserService userService;
+	//http://9091/api/v1/users/1
+	@GetMapping("/users/{userid}")
+	public ResponseEntity<User> getUserById( @PathVariable(value="userid") Integer userid) {
+		try {
+			User user = userService.getUserById(userid);
+			return new ResponseEntity<>(user, HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+		
+	}
+	/*
+	 * {
+       "userid": null,
+       "username": "srini",
+       "password": "srini@123",
+       "email": "srini@gmail.com",
+       "mobile": 9976567680,
+       "role": "USER"
+ 		}
+	 */
+	//http://9091/api/v1/users
+	/*
+	 * Validate User object coming from the client before saving to database
+	 */
+	@PostMapping("/users")
+	public ResponseEntity<User> addUser(@Valid @RequestBody User user, BindingResult bindingResult) {
+		try {
+			if(bindingResult.hasErrors()) {
+				throw new UserException(bindingResult.getAllErrors().toString());
+			}
+			
+			User newUser = userService.addUser(user);
+			return new ResponseEntity<>(newUser,HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+		
+	}
+	//http://9091/api/v1/users
+	@GetMapping("/users")
+	public ResponseEntity<List<User>> getAllUsers() {
+		try {
+			List<User> userList = userService.getAllUsers();
+			return new ResponseEntity<>(userList,HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+		
+	}
+
+
+
+
+@PutMapping("/users")
+	public ResponseEntity<User> updateUser( @Valid  @RequestBody User user, BindingResult bindingResult){
+		try {
+			if(bindingResult.hasErrors()) {
+				throw new UserException(bindingResult.getAllErrors().toString());
+			}
+			
+			User updatedUser = userService.updateUser(user);
+			return new ResponseEntity<>(updatedUser,HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+	}
+	
+	@DeleteMapping("/users/{userid}")
+	public ResponseEntity<User> deleteUser( @PathVariable(value="userid") Integer userid) {
+		try {
+			User deletedUser = userService.deleteUser(userid);
+			return new ResponseEntity<>(deletedUser, HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+		
+	}
+
+
+
+
+
+
+}
+
+
+
+
+
+
+—---------------------spring-rest-template—-----------------
+
+
+<dependency>
+	    		<groupId>org.springframework.boot</groupId>
+	    		<artifactId>spring-boot-starter-validation</artifactId>
+	   
+		</dependency>
+
+
+
+
+—---------------------------------------------------------------
+
+
+package com.wipro.model;
+import org.springframework.stereotype.Component;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+@Builder
+@Component
+public class User {
+   private Integer userid;
+   @NotBlank
+   private String username;
+   @Size(min = 5)
+   private String password;
+   @Email
+   private String email;
+   private Long mobile;
+   private Role role;
+}
+
+
+
+
+
+
+—-------------------------------------------------
+
+//	@Bean
+//	public RestTemplate restTemplate() {
+//		return new RestTemplate();
+//	}
+	
+	@Bean
+	public RestTemplate restTemplate(RestTemplateBuilder builder) {
+		return builder.build();
+	}
+
+—------------------------------------------------------------------------------
+
+package com.wipro.controller;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
+import com.wipro.model.User;
+/*
+* spring-rest-template application is a consumer application
+* spring-boot-jpa application is producer application
+*
+* Consumer application makes calls to producer application through RestTemplate object
+*/
+@RestController
+@RequestMapping("/cc")
+public class UserConsumerController {
+	
+	@Autowired
+	private RestTemplate restTemplate;
+	
+	@GetMapping("/users/{userid}")
+	public ResponseEntity<User> consumeUserById(@PathVariable(value="userid" )Integer userid){
+		//API end-point of producer application
+		final String uri = "http://localhost:9091/api/v1/users/{userid}";	  
+		try {
+			Map<String, Integer> params = new HashMap<>();
+			params.put("userid", userid);
+			User user =
+					restTemplate.getForObject(uri, User.class, params);
+			System.out.println(user);
+			return  new ResponseEntity<>(user,HttpStatus.OK);
+		}catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+	}
+	
+	
+	
+	@GetMapping("/users")
+	public ResponseEntity<List<User>> consumeAllUsers(){
+		//API end-point of producer application
+		final String uri = "http://localhost:9091/api/v1/users";	  
+		try {
+			
+			
+			ResponseEntity<List<User>> response = restTemplate
+				       .exchange(uri, HttpMethod.GET, null,  new ParameterizedTypeReference<List<User>>() {});
+			
+			
+			
+			return  response;
+		}catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+	}
+	
+	
+	@PostMapping("/users")
+	public ResponseEntity<User> sendUser(@RequestBody User user){
+		final String uri = "http://localhost:9091/api/v1/users";	  
+		try {
+	
+			ResponseEntity<User> response = restTemplate.postForEntity(uri, user, User.class);
+			
+			return  response;
+		}catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+	}
+	
+	
+	@PutMapping("/users")
+	public ResponseEntity<User> updateUser(@RequestBody User user){
+		final String uri = "http://localhost:9091/api/v1/users";	  
+		try {
+	
+//			 restTemplate.put(uri, user);
+			
+			HttpEntity<User> request = new HttpEntity<User>(user);
+			
+			ResponseEntity<User> response = restTemplate
+				       .exchange(uri, HttpMethod.PUT, request,new ParameterizedTypeReference<User>() {});
+			
+			return response;
+		}catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+	}
+	
+	
+	//http://localhost:9092/cc/users/1
+	@DeleteMapping("/users/{userid}")
+	public ResponseEntity<User> deleteUser(@PathVariable(value="userid") Integer userid){
+		final String uri = "http://localhost:9091/api/v1/users/{userid}";	  
+		
+		try {
+	
+			Map<String, Integer> params = new HashMap<>();
+			params.put("userid", userid);
+			ResponseEntity<User> user = this.consumeUserById(userid);
+			
+			restTemplate.delete(uri, params);
+			
+			return user;
+			
+		}catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+	}
+}
+
+
+
+
+
+
+
+—------------------------------------spring-boot-jpa----------------------
+
+
+package com.wipro.dao;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+/*
+* save(), findById(), findAll(), count(), existsById(), deleteById(), delete(), deleteAll()
+*/
+import com.wipro.entity.User;
+@Repository
+public interface UserRepository extends CrudRepository<User,Integer>{
+}
+
+
+—--------------------------------------
+
+package com.wipro.service;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.wipro.dao.UserRepository;
+import com.wipro.entity.User;
+import com.wipro.exception.UserException;
+//The methods of this class invoke CRUDRepositry methods
+@Service(value = "userServiceBean")
+@Transactional
+public class UserServiceCrudImpl implements UserService {
+	
+	@Autowired
+	private UserRepository userRepository;
+	@Override
+	public User getUserById(Integer userid) throws UserException {
+		try {
+			Optional<User> optional = userRepository.findById(userid);
+			if(optional.isEmpty()) {
+				throw new UserException("Invalid Userid");
+			}
+			System.out.println("The getUserById() of UserServiceCrudImpl class invoked");
+			return optional.get();
+		}catch(DataAccessException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+		
+	}
+	@Override
+	public List<User> getAllUsers() throws UserException {
+		try {
+			 Iterable<User> iterable = userRepository.findAll();
+			 List<User> userList = new ArrayList<>();
+			
+			 for(User u: iterable) {
+				 userList.add(u);
+			 }
+			
+			if(userList.isEmpty()) {
+				throw new UserException("Table is empty");
+			}
+			
+			return userList;
+		}catch(DataAccessException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+	@Override
+	public User addUser(User user) throws UserException {
+		try {
+			User newUser = userRepository.save(user);
+			return newUser;
+		}catch(DataAccessException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+	@Override
+	public User deleteUser(Integer userID) throws UserException {
+		try {
+			User user = this.getUserById(userID);
+			
+			userRepository.deleteById(userID);
+			return user;
+		}catch(DataAccessException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+	@Override
+	public User updateUser(User user) throws UserException {
+		try {
+			User newUser = userRepository.save(user);
+			return newUser;
+		}catch(DataAccessException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+}
+
+
+
+
+
+—---------------------------------------------
+
+package com.wipro.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.wipro.entity.User;
+import com.wipro.exception.UserException;
+import com.wipro.service.UserService;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/api/v1")
+//allow any client application to access the API end-points of this RestController
+@CrossOrigin(origins = "*")
+public class UserController {
+	
+	
+	// Autowired byType, UserServiceImpl bean is injected
+//	@Autowired
+//	private UserService userService;
+	
+	
+	// Autowired byName, UserServiceCrudImpl bean is injected
+	@Autowired(required = false)
+	@Qualifier(value = "userServiceBean")
+	private UserService userService;
+
+	//http://localhost:9091/api/v1/users/1
+	@GetMapping("/users/{userid}")
+	public ResponseEntity<User> getUserById( @PathVariable(value="userid") Integer userid) {
+		try {
+			User user = userService.getUserById(userid);
+			return new ResponseEntity<>(user, HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+		
+	}
+
+	/*
+	 * {
+        "userid": null,
+        "username": "srini",
+        "password": "srini@123",
+        "email": "srini@gmail.com",
+        "mobile": 9976567680,
+        "role": "USER"
+  		}
+	 */
+	//http://9091/api/v1/users
+	/*
+	 * Validate User object coming from the client before saving to database
+	 */
+	@PostMapping("/users")
+	public ResponseEntity<User> addUser(@Valid @RequestBody User user, BindingResult bindingResult) {
+		try {
+			if(bindingResult.hasErrors()) {
+				throw new UserException(bindingResult.getAllErrors().toString());
+			}
+			
+			User newUser = userService.addUser(user);
+			return new ResponseEntity<>(newUser,HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+		
+	}
+
+
+	//http://9091/api/v1/users
+	@GetMapping("/users")
+	public ResponseEntity<List<User>> getAllUsers() {
+		try {
+			List<User> userList = userService.getAllUsers();
+			return new ResponseEntity<>(userList,HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+		
+	}
+	
+	@PutMapping("/users")
+	public ResponseEntity<User> updateUser( @Valid  @RequestBody User user, BindingResult bindingResult){
+		try {
+			if(bindingResult.hasErrors()) {
+				throw new UserException(bindingResult.getAllErrors().toString());
+			}
+			
+			User updatedUser = userService.updateUser(user);
+			return new ResponseEntity<>(updatedUser,HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+	}
+	
+	@DeleteMapping("/users/{userid}")
+	public ResponseEntity<User> deleteUser( @PathVariable(value="userid") Integer userid) {
+		try {
+			User deletedUser = userService.deleteUser(userid);
+			return new ResponseEntity<>(deletedUser, HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+		
+	}
+
+}
+
+—-----------------------------------------------------------------
+
+package com.wipro.dao;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+/*
+* save(), findById(), findAll(), count(), existsById(), deleteById(), delete(), deleteAll()
+*/
+import com.wipro.entity.User;
+//@Repository
+//public interface UserRepository extends CrudRepository<User,Integer>{
+//
+//}
+/*
+* additional methods related to Pagination and Sorting plus methods related to
+* delete record in batch and flushing persistence context
+*/
+@Repository
+public interface UserRepository extends JpaRepository<User,Integer>{
+}
+
+—-------------------------------
+package com.wipro.service;
+
+import java.util.List;
+
+import com.wipro.entity.User;
+import com.wipro.exception.UserException;
+
+
+
+public interface UserService {
+	public User getUserById(Integer userid) throws UserException;
+	public List<User> getAllUsers() throws UserException;
+	public User addUser(User user) throws UserException;
+	public User deleteUser(Integer userID) throws UserException;
+	public User updateUser(User user) throws UserException;
+	
+	public List<User> getUsersByPages(Integer pageNumber, Integer recordsPerPage, String sortBy) throws UserException;
+}
+
+
+—--------------------------------------
+package com.wipro.service;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.wipro.dao.UserRepository;
+import com.wipro.entity.User;
+import com.wipro.exception.UserException;
+import jakarta.persistence.PersistenceException;
+//The methods of this class invoke CRUDRepositry methods
+@Service(value = "userServiceBean")
+@Transactional
+public class UserServiceCrudImpl implements UserService {
+	
+	@Autowired
+	private UserRepository userRepository;
+	@Override
+	public User getUserById(Integer userid) throws UserException {
+		try {
+			Optional<User> optional = userRepository.findById(userid);
+			if(optional.isEmpty()) {
+				throw new UserException("Invalid Userid");
+			}
+			System.out.println("The getUserById() of UserServiceCrudImpl class invoked");
+			return optional.get();
+		}catch(DataAccessException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+		
+	}
+	@Override
+	public List<User> getAllUsers() throws UserException {
+		try {
+			 Iterable<User> iterable = userRepository.findAll();
+			 List<User> userList = new ArrayList<>();
+			
+			 for(User u: iterable) {
+				 userList.add(u);
+			 }
+			
+			if(userList.isEmpty()) {
+				throw new UserException("Table is empty");
+			}
+			
+			return userList;
+		}catch(DataAccessException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+	@Override
+	public User addUser(User user) throws UserException {
+		try {
+			User newUser = userRepository.save(user);
+			return newUser;
+		}catch(DataAccessException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+	@Override
+	public User deleteUser(Integer userID) throws UserException {
+		try {
+			User user = this.getUserById(userID);
+			
+			userRepository.deleteById(userID);
+			return user;
+		}catch(DataAccessException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+	@Override
+	public User updateUser(User user) throws UserException {
+		try {
+			User newUser = userRepository.save(user);
+			return newUser;
+		}catch(DataAccessException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+	@Override
+	public List<User> getUsersByPages(Integer pageNumber, Integer recordsPerPage, String sortBy) throws UserException {
+		try {
+			
+			/*
+			 * Ex. pageNumber=2, recordsPerPage=10, say your table has 100 records
+			 * returns: 11th row to 20th row
+			 */
+			Pageable pageable = PageRequest.of(pageNumber, recordsPerPage, Sort.by(sortBy));
+			List<User> userList = userRepository.findAll(pageable).getContent();
+			if(userList.isEmpty()) {
+				throw new PersistenceException("Table is empty");
+			}
+			return userList;
+		}catch(DataAccessException e) {
+			throw new UserException(e.getMessage(),e);
+		}
+	}
+}
+
+
+
+—--------------------------------------------------------
+package com.wipro.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.wipro.entity.User;
+import com.wipro.exception.UserException;
+import com.wipro.service.UserService;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/api/v1")
+//allow any client application to access the API end-points of this RestController
+@CrossOrigin(origins = "*")
+public class UserController {
+	
+	
+	// Autowired byType, UserServiceImpl bean is injected
+//	@Autowired
+//	private UserService userService;
+	
+	
+	// Autowired byName, UserServiceCrudImpl bean is injected
+	@Autowired(required = false)
+	@Qualifier(value = "userServiceBean")
+	private UserService userService;
+
+	//http://localhost:9091/api/v1/users/1
+	@GetMapping("/users/{userid}")
+	public ResponseEntity<User> getUserById( @PathVariable(value="userid") Integer userid) {
+		try {
+			User user = userService.getUserById(userid);
+			return new ResponseEntity<>(user, HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+		
+	}
+
+	/*
+	 * {
+        "userid": null,
+        "username": "srini",
+        "password": "srini@123",
+        "email": "srini@gmail.com",
+        "mobile": 9976567680,
+        "role": "USER"
+  		}
+	 */
+	//http://localhost:9091/api/v1/users
+	/*
+	 * Validate User object coming from the client before saving to database
+	 */
+	@PostMapping("/users")
+	public ResponseEntity<User> addUser(@Valid @RequestBody User user, BindingResult bindingResult) {
+		try {
+			if(bindingResult.hasErrors()) {
+				throw new UserException(bindingResult.getAllErrors().toString());
+			}
+			
+			User newUser = userService.addUser(user);
+			return new ResponseEntity<>(newUser,HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+		
+	}
+
+
+	//http://9091/api/v1/users
+	@GetMapping("/users")
+	public ResponseEntity<List<User>> getAllUsers() {
+		try {
+			List<User> userList = userService.getAllUsers();
+			return new ResponseEntity<>(userList,HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+		
+	}
+	
+	@PutMapping("/users")
+	public ResponseEntity<User> updateUser( @Valid  @RequestBody User user, BindingResult bindingResult){
+		try {
+			if(bindingResult.hasErrors()) {
+				throw new UserException(bindingResult.getAllErrors().toString());
+			}
+			
+			User updatedUser = userService.updateUser(user);
+			return new ResponseEntity<>(updatedUser,HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+	}
+	
+	@DeleteMapping("/users/{userid}")
+	public ResponseEntity<User> deleteUser( @PathVariable(value="userid") Integer userid) {
+		try {
+			User deletedUser = userService.deleteUser(userid);
+			return new ResponseEntity<>(deletedUser, HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+		
+	}
+	
+	
+	//http://localhost:9091/api/v1/users/2/2/mobile
+	@GetMapping("/users/{pageNumber}/{rows}/{sortBy}")
+	public ResponseEntity<List<User>> getUsersByPages(@PathVariable(value="pageNumber") Integer pageNumber,
+													  @PathVariable(value="rows") Integer rows, 
+													  @PathVariable(value="sortBy") String sortBy
+														){
+		try {
+			//internally page 1 is 0, index starts from 0
+			List<User> userList = userService.getUsersByPages(pageNumber-1, rows,sortBy);
+			return new ResponseEntity<>(userList,HttpStatus.OK);
+		}catch(UserException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,e.getMessage());
+		}
+		
+	}
+			
+
+}
+
+
+
+—------------
