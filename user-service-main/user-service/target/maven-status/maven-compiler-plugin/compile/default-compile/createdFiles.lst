@@ -1,0 +1,7 @@
+com/wipro/repository/UserRepository.class
+com/wipro/service/UserServiceImpl.class
+com/wipro/controller/UserController.class
+com/wipro/service/UserService.class
+com/wipro/entity/User.class
+com/wipro/UserServiceApplication.class
+com/wipro/service/DataLoader.class
